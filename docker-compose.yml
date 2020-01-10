@@ -1,0 +1,43 @@
+version: "3"
+services:
+  nginx:
+    build:
+      context: ./
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - '${NGINX_HOST_PORT_80}:80'
+    volumes:
+      - ./nginx/:/etc/nginx/conf.d/
+      - ./logs/nginx:/var/log/nginx
+      - ./wordpress:/var/www/html
+    depends_on:
+      - wordpress
+
+  wordpress:
+    image: wordpress:php7.3-fpm
+    environment:
+      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
+      - WORDPRESS_DB_USER=${WORDPRESS_DB_USER}
+      - WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
+      - WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME}
+      - TZ=${TZ}
+    volumes:
+      - ./wordpress:/var/www/html
+    links:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - TZ=${TZ}
+
+volumes:
+  nginx:
+  wordpress:
+  mysql:
