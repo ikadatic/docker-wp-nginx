@@ -2,3 +2,4 @@
 wordpress/
 logs/
 mysql/
+node_modules/
